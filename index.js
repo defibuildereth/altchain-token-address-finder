@@ -220,24 +220,39 @@ getRelevantTokens()
 
 
 const getTokenDetails = async function (list, tokenDetails) {
-    // let tokenDetails = []
+    let fullTokenDetails = []
     for (let i = 0; i < list.length; i++) {
         let id = list[i].id
         coinGeckoAPI.schedule(() => {
             CoinGeckoClient.coins.fetch(id, {})
                 .then(r => {
                     let ethAddress = r.data.platforms.ethereum  
-                    let id = r.data.id
-                    for(let i = 0; i < tokenDetails.length; i++) {
-                        if (tokenDetails[i].address == ethAddress) {
-                            console.log(id, ethAddress, r.data.platforms)
-
+                    for(let l = 0; l < tokenDetails.length; l++) {
+                        if (tokenDetails[l].address == ethAddress) {
+                            let obj = {...tokenDetails[l]}
+                            let keys = Object.keys(r.data.platforms)
+                            let values = Object.values(r.data.platforms)
+                            for (let i = 0; i < keys.length; i++) {
+                                if (keys[i] == 'polygon-pos') {
+                                    let network = keys[i]
+                                    let address = values[i]
+                                    // console.log(tokenDetails[l], id, keys[i], values[i])
+                                    obj = {...obj, [network]: address}
+                                }
+                                if (keys[i] == 'arbitrum-one') {
+                                    let network = keys[i]
+                                    let address = values[i]
+                                    // console.log(tokenDetails[l], id, keys[i], values[i])
+                                    obj = {...obj, [network]: address}
+                                }
+                            }
+                            console.log(JSON.stringify(obj, 2))
                         }
                     }
-                    // tokenDetails.push({token: r.data.id, data: r.data.platforms})
                 })
         })
     }
-    // console.log(tokenDetails)
+
+    // console.log(fullTokenDetails)
 }
 
